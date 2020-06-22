@@ -38,10 +38,8 @@ def scrollToBottom():
     return bs(driver.page_source, 'html.parser')
 def storeLinks(soup):
     links=[]
-
     for link in soup.find_all('a'):
         if (link.get('href') != None):
-
             if("watch" in link.get("href")):
                 links.append(link.get("href"))
                 #open("links.txt", "a").write("\n" + link.get("href"))
@@ -54,13 +52,13 @@ def storeLinks(soup):
     for i in result:
         open("links.txt", "a").write("\n" + i)
 def downloadLinks():
+    #youtube-dl has no freaking documentation so im lucky I even got this far
     ydl_opts = {
         'format': '18',
         'outtmpl': "%(title)s%(upload_date)s"}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         for i in open("links.txt", "r").readlines()[::-1]:
             try:
-                
                 ydl.download([str('www.youtube.com' + i)])
             except Exception:
                 print('failed')
