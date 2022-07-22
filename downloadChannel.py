@@ -2,7 +2,6 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import youtube_dl
 from bs4 import BeautifulSoup as bs
-import os.path
 from os import path
 import time
 if path.exists('links.txt'):
@@ -10,28 +9,26 @@ if path.exists('links.txt'):
 else:
     options = webdriver.ChromeOptions()
     options.add_argument('headless')
-    driver=webdriver.Chrome(options=options)
-    driver.get("https://www.youtube.com/channel/UCIcgBZ9hEJxHv6r_jDYOMqg/videos")
+    driver=webdriver.Chrome(options=options, executable_path='chromedriver.exe')
+    driver.get("https://www.youtube.com/c/DudePerfect/videos")
     driver.set_window_size(1280,1024)
+#scroll to the bottom of the page    
 def scrollToBottom():
-
-    SCROLL_PAUSE_TIME = 1
+    SCROLL_PAUSE_TIME = 2
 
     # Get scroll height
     time.sleep(2)
-    #this variable could be different for a different channel
-    index = 0
-    last_height = driver.execute_script(f'return document.getElementsByClassName("ytd-page-manager")[{index}].scrollHeight')
+    last_height = driver.execute_script(f"return document.getElementById('content').scrollHeight")
     print('downloading full page')
     while True:
         # Scroll down to bottom
-        driver.execute_script(f'window.scrollTo(0, document.getElementsByClassName("ytd-page-manager")[{index}].scrollHeight);')
+        driver.execute_script(f"window.scrollTo(0, document.getElementById('content').scrollHeight)")
 
         # Wait to load page
         time.sleep(SCROLL_PAUSE_TIME)
 
         # Calculate new scroll height and compare with last scroll height
-        new_height = driver.execute_script(f'return document.getElementsByClassName("ytd-page-manager")[{index}].scrollHeight')
+        new_height = driver.execute_script(f"return document.getElementById('content').scrollHeight")
         if new_height == last_height:
             break
         last_height = new_height
@@ -54,8 +51,8 @@ def storeLinks(soup):
 def downloadLinks():
     #youtube-dl has no freaking documentation so im lucky I even got this far
     ydl_opts = {
-        'format': '18',
-        'outtmpl': "%(title)s%(upload_date)s"}
+        'format': '22',
+        'outtmpl': "%(title)s%(upload_date)s.mp4"}
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         for i in open("links.txt", "r").readlines()[::-1]:
             try:
